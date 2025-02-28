@@ -4,13 +4,14 @@ import os
 from typing import List, Dict, Any
 
 from langchain_ollama import OllamaEmbeddings
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import QdrantVectorStore as Qdrant
 from langchain_community.document_loaders import TextLoader
-from langchain_community.llms.ollama import Ollama
+from langchain_ollama import OllamaLLM as Ollama
 from langchain.chains.retrieval_qa.base import RetrievalQA
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.prompts import PromptTemplate
 
+from qdrant_client import http as qdrant_http
 from qdrant_client import QdrantClient
 
 
@@ -19,35 +20,22 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
 OLLAMA_LLM_MODEL = os.getenv("OLLAMA_LLM_MODEL", "llama3")
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
-COLLECTION_NAME = "documents2"
+DOCUMENTS_DIR = "./documents"
+COLLECTION_NAME = "documents3"
 
 def initialize_qdrant() -> QdrantClient:
     """Initialize Qdrant client"""
     return QdrantClient(url=QDRANT_URL)
 
 def load_sample_documents() -> List[str]:
-    """Load sample documents"""
-    return [
-        "Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to intelligence displayed by humans or other animals. "
-        "AI applications include advanced web search engines, recommendation systems, understanding human speech, self-driving cars, "
-        "automated decision-making, and competing at the highest level in strategy games.",
-        
-        "Machine learning is a subset of artificial intelligence which focuses on the use of data and algorithms to imitate the way humans learn, "
-        "gradually improving its accuracy. Machine learning algorithms build a model based on sample data, known as training data, "
-        "in order to make predictions or decisions without being explicitly programmed to do so.",
-        
-        "Natural Language Processing (NLP) is a subfield of AI focused on the interaction between computers and humans through natural language. "
-        "The ultimate objective of NLP is to enable computers to understand, interpret, and generate human language in a way that is valuable. "
-        "NLP applications include chatbots, translation services, and sentiment analysis.",
-        
-        "Computer vision is a field of AI that trains computers to interpret and understand the visual world. "
-        "Using digital images from cameras and videos and deep learning models, machines can accurately identify and classify objects "
-        "and then react to what they 'see'. Applications include facial recognition, autonomous vehicles, and medical image analysis.",
-        
-        "Reinforcement learning is an area of machine learning concerned with how intelligent agents ought to take actions in an environment "
-        "in order to maximize the notion of cumulative reward. Reinforcement learning differs from supervised learning in that labeled input/output "
-        "pairs need not be presented, and sub-optimal actions need not be explicitly corrected.",
-    ]
+    """Load all markdown documents from DOCUMENTS_DIR"""
+    documents = []
+    for filename in os.listdir(DOCUMENTS_DIR):
+        if filename.endswith('.md'):
+            file_path = os.path.join(DOCUMENTS_DIR, filename)
+            with open(file_path, 'r', encoding='utf-8') as f:
+                documents.append(f.read())
+    return documents
 
 def create_documents(texts: List[str]) -> List[Dict[str, Any]]:
     """Convert texts to document format"""
@@ -87,9 +75,9 @@ def create_vector_store(client, embeddings, documents):
         # Create collection if it doesn't exist
         client.create_collection(
             collection_name=COLLECTION_NAME,
-            vectors_config=qdrant_client.http.models.VectorParams(
+            vectors_config=qdrant_http.models.VectorParams(
                 size=embedding_dimension,
-                distance=qdrant_client.http.models.Distance.COSINE
+                distance=qdrant_http.models.Distance.COSINE
             )
         )
         print(f"Created collection {COLLECTION_NAME} with dimension {embedding_dimension}")
@@ -114,7 +102,7 @@ def setup_retrieval_qa_chain(embeddings):
     vectorstore = Qdrant(
         client=QdrantClient(url=QDRANT_URL),
         collection_name=COLLECTION_NAME,
-        embeddings=embeddings,
+        embedding=embeddings,
     )
     
     # Create retriever
@@ -179,7 +167,7 @@ def initialize_system():
 
 def query_system(qa_chain, question: str) -> str:
     """Query the RAG system with a question"""
-    result = qa_chain({"query": question})
+    result = qa_chain.invoke({"query": question})
     return result["result"]
 
 def main():
