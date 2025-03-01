@@ -61,6 +61,8 @@ ollama serve
 python main.py
 ```
 
+4. Enter question and check answers 🚀
+
 ![RAG System Local](local-screenshot.png)
 
 4. See the vector store to check all documents are ingested
