@@ -13,7 +13,7 @@ This application implements a Retrieval-Augmented Generation (RAG) system that:
 - Python 3.12+
 - Docker
 - [Ollama](https://ollama.com/) installed and running locally
-- Qdrant running locally using docker
+- Qdrant running locally (Docker command is given below)
 
 ## Installation
 
