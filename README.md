@@ -24,10 +24,12 @@ pip install -r requirements.txt
 ```
 3. Set up environment variables (optional, defaults are set in the code):
 ```
-export OLLAMA_BASE_URL="http://localhost:11434"
-export OLLAMA_EMBED_MODEL="nomic-embed-text"
-export OLLAMA_LLM_MODEL="llama3"
-export QDRANT_URL="http://localhost:6333"
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+OLLAMA_LLM_MODEL = os.getenv("OLLAMA_LLM_MODEL", "llama3")
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+DOCUMENTS_DIR = "./documents"
+COLLECTION_NAME = "documents-1"
 ```
 
 ## Required Ollama Models
