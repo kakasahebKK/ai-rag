@@ -6,6 +6,8 @@ This application implements a Retrieval-Augmented Generation (RAG) system that:
 2. Retrieves relevant information from a Qdrant vector database
 3. Uses the retrieved context to generate accurate answers with locally hosted Ollama models
 
+![RAG System Architecture](rag-system.png)
+
 ## Prerequisites
 
 - Python 3.12+
