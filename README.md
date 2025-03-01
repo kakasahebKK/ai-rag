@@ -61,6 +61,8 @@ ollama serve
 python main.py
 ```
 
+![RAG System Local](local-screenshot.png)
+
 4. See the vector store to check all documents are ingested
 
     Open link: http://localhost:6333/dashboard#/collections
