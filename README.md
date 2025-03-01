@@ -1,15 +1,17 @@
 # RAG Application with LangChain, Qdrant, and Ollama
 
 This application implements a Retrieval-Augmented Generation (RAG) system that:
+1. Ingest documents into Qdrant vector database
 1. Takes user questions as input
 2. Retrieves relevant information from a Qdrant vector database
 3. Uses the retrieved context to generate accurate answers with locally hosted Ollama models
 
 ## Prerequisites
 
-- Python 3.8+
-- [Ollama](https://ollama.ai/) installed and running locally
-- Qdrant running locally or as a cloud service
+- Python 3.12+
+- Docker
+- [Ollama](https://ollama.com/) installed and running locally
+- Qdrant running locally using docker
 
 ## Installation
 
@@ -30,7 +32,7 @@ export QDRANT_URL="http://localhost:6333"
 
 Ensure you have the necessary models pulled in Ollama:
 
-1. For embeddings (you can choose a different embedding model):
+1. For embeddings (you can choose a different embedding model as well):
 ```
 ollama pull nomic-embed-text
 ```
@@ -57,10 +59,9 @@ ollama serve
 python main.py
 ```
 
-4. (Optional) Add custom documents:
-```
-python sample_documents.py
-```
+4. See the vector store to check all documents are ingested
+
+    Open link: http://localhost:6333/dashboard#/collections
 
 ## Usage
 
@@ -73,15 +74,7 @@ Once the application is running, you will be prompted to input questions. The sy
 
 Type 'exit' to quit the application.
 
-## Customization
-
-- Modify the sample documents in `main.py` or `sample_documents.py`
-- Adjust the chunk size and overlap in the `split_documents` function
-- Change the retrieval parameters (like the number of chunks to retrieve) in the `setup_retrieval_qa_chain` function
-- Update the prompt template to customize how the LLM processes the context and questions
-- Change the Ollama models by setting environment variables or modifying the defaults in the code
-
-## Extending the Application
+## Future extension ideas
 
 You can extend this application by:
 - Adding document loaders for various file types (PDFs, Word documents, websites)
